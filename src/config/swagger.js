@@ -25,6 +25,10 @@ const swaggerDefinition = {
       url: 'http://localhost:3000',
       description: 'Development server',
     },
+    {
+      url: 'http://13.232.94.63:3001',
+      description: 'Staging server',
+    },
   ],
   components: {
     securitySchemes: {
