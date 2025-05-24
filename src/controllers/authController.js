@@ -111,6 +111,7 @@ class AuthController {
           role: user.role,
           token,
         },
+        message: 'Login successful',
       });
     } catch (error) {
       next(error);
