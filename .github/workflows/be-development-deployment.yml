@@ -44,7 +44,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no -i ec2_key.pem ${{ vars.EC2_USER }}@${{ env.EC2_IP }} << 'EOF'
           set -e
-          cd /home/ubuntu/var/www/html/tnt-development/tnt-backend
+          cd /var/www/html/tnt-development/tnt-backend
           
           echo "Pulling latest code..."
           git pull origin development
