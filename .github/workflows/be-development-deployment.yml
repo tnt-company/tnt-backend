@@ -1,0 +1,56 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Development  
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up SSH key
+      run: |
+        echo "${{ secrets.EC2_SSH_KEY }}" > ec2_key.pem
+        chmod 600 ec2_key.pem
+
+    - name: Configure AWS CLI
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Get EC2 Public IP
+      id: ec2ip
+      run: |
+        IP=$(aws ec2 describe-instances \
+          --instance-ids ${{ secrets.EC2_INSTANCE_ID }} \
+          --query "Reservations[0].Instances[0].PublicIpAddress" \
+          --output text)
+        echo "EC2_IP=$IP" >> $GITHUB_ENV
+
+    - name: Deploy to EC2 with DB migration
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ec2_key.pem ${{ secrets.EC2_USER }}@${{ env.EC2_IP }} << 'EOF'
+          set -e
+          cd /home/ubuntu/var/www/html/tnt-development/tnt-backend
+          
+          echo "Pulling latest code..."
+          git pull origin development
+          
+          echo "Installing dependencies..."
+          npm install
+
+        #  echo "Running migrations..."
+         # npm run migrate  
+
+          echo "Restarting app..."
+          pm2 restart test.json 
+        EOF
+
