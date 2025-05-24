@@ -55,8 +55,8 @@ jobs:
           echo "Installing dependencies..."
           npm install
 
-        #  echo "Running migrations..."
-         # npm run migrate  
+          echo "Running migrations..."
+          npx sequelize-cli db:migrate  
 
           echo "Restarting app..."
           pm2 restart test.json 
