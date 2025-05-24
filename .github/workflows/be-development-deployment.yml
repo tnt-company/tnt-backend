@@ -44,6 +44,9 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no -i ec2_key.pem ${{ vars.EC2_USER }}@${{ env.EC2_IP }} << 'EOF'
           set -e
+          # Add Node and npm to PATH
+          export PATH="$HOME/.nvm/versions/node/v18.17.1/bin:$PATH"
+
           cd /var/www/html/tnt-development/tnt-backend
           
           echo "Pulling latest code..."
