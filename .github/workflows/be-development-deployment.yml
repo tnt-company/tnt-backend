@@ -26,6 +26,11 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ vars.AWS_REGION }}
 
+    - name: Download SSH key from S3
+      run: |
+        aws s3 cp s3://tnt-development-new/environment-variables/config/tnt-development.pem  ec2_key.pem
+        chmod 600 ec2_key.pem
+
     - name: Get EC2 Public IP
       id: ec2ip
       run: |
