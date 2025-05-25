@@ -14,7 +14,6 @@ class ProductController {
    */
   async getProducts(req, res, next) {
     try {
-      console.log("log checkkkkkkkkkkkkkkkkkkk")
       const { products, totalProducts } = await productService.getAllProducts(
         req.query.page,
         req.user.role,
@@ -105,7 +104,6 @@ class ProductController {
    */
   async updateProduct(req, res, next) {
     try {
-      console.log('req.files', req.files);
       const updateData = { ...req.body };
 
       // Get current product to check if we need to delete old images
