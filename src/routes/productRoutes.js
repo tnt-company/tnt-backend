@@ -24,9 +24,13 @@ const upload = multer({
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
     } else {
+      console.log(`File rejected: ${file.originalname} - Invalid mimetype: ${file.mimetype}`);
       cb(new Error('Only image files are allowed!'), false);
     }
   },
+}).on('error', (err, next) => {
+  console.log(`File size error: ${err.message}`);
+  next(err);
 });
 
 // All product routes require authentication
