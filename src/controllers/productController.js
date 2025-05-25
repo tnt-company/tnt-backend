@@ -144,6 +144,20 @@ class ProductController {
 
         // Set the imageUrls in update data
         updateData.imageUrls = imageUrls;
+      } else {
+        // If no files provided, delete all existing images
+        if (currentProduct.imageUrls && currentProduct.imageUrls.length > 0) {
+          const deletePromises = currentProduct.imageUrls.map(imageUrl =>
+            storageProvider.deleteFile(imageUrl).catch(err => {
+              console.error(`Error deleting image ${imageUrl}:`, err.message);
+            })
+          );
+
+          await Promise.all(deletePromises);
+        }
+        
+        // Set empty array in update data
+        updateData.imageUrls = [];
       }
 
       const product = await productService.updateProduct(req.params.id, updateData);
