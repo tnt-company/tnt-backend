@@ -28,10 +28,21 @@ const upload = multer({
       cb(new Error('Only image files are allowed!'), false);
     }
   },
-}).on('error', (err, next) => {
-  console.log(`File size error: ${err.message}`);
-  next(err);
 });
+
+// Custom error handler for multer errors like file size
+const handleMulterErrors = (req, res, next) => {
+  upload.array('images', 10)(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      console.log(`Multer error: ${err.message} for field ${err.field}`);
+      return res.status(400).json({ success: false, message: `Image upload error: ${err.message}` });
+    } else if (err) {
+      console.log(`Other upload error: ${err.message}`);
+      return res.status(400).json({ success: false, message: err.message });
+    }
+    next();
+  });
+};
 
 // All product routes require authentication
 router.use(protect);
@@ -43,7 +54,7 @@ router.route('/:id').get(validate(validateProductId), productController.getProdu
 // Routes that require admin access
 router.route('/').post(
   adminOnly,
-  upload.array('images', 10), // Allow up to 10 images
+  handleMulterErrors, // Replace direct upload.array call
   validate(validateCreateProduct),
   productController.createProduct
 );
@@ -52,7 +63,7 @@ router
   .route('/:id')
   .put(
     adminOnly,
-    upload.array('images', 10), // Allow up to 10 images
+    handleMulterErrors, // Replace direct upload.array call
     validate(validateUpdateProduct),
     productController.updateProduct
   )
