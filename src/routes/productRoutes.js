@@ -16,10 +16,13 @@ const router = express.Router();
 // Configure multer for memory storage (we'll upload to S3 from memory)
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 5 * 1024 * 1024, // limit to 5MB
-  },
+  // limits: {
+  //   fileSize: 5 * 1024 * 1024, // limit to 5MB
+  // },
   fileFilter: (req, file, cb) => {
+    // Log the file info for debugging
+    console.log(`Incoming file: ${file.originalname}, Size: ${file.size || 'unknown'} bytes, Type: ${file.mimetype}`);
+    
     // Accept only images
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
@@ -34,6 +37,14 @@ const upload = multer({
 const handleMulterErrors = (req, res, next) => {
   upload.array('images', 10)(req, res, (err) => {
     if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        // For file size errors, we want to provide more details
+        console.log(`File size error: File exceeded 5MB limit. Error: ${err.message}`);
+        return res.status(400).json({ 
+          success: false, 
+          message: `Image upload error: File size exceeds the 5MB limit` 
+        });
+      }
       console.log(`Multer error: ${err.message} for field ${err.field}`);
       return res.status(400).json({ success: false, message: `Image upload error: ${err.message}` });
     } else if (err) {
