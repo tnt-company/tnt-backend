@@ -27,7 +27,7 @@ const HTTP_STATUS = {
 
 // Pagination defaults
 const PAGINATION = {
-  DEFAULT_LIMIT: 10,
+  DEFAULT_LIMIT: 20,
   DEFAULT_PAGE: 1,
 };
 
