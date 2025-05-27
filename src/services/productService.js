@@ -33,7 +33,10 @@ class ProductService {
       whereClause.categoryId = categoryId;
     }
 
-    const totalProducts = await Product.count({ where: whereClause });
+    const totalProducts = await Product.count({ 
+      where: whereClause,
+      order: [['name', 'ASC']]
+    });
 
     // Define attributes to select based on role
     const attributes =
