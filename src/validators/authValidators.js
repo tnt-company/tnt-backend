@@ -48,7 +48,29 @@ const validateSignup = [
     .withMessage('Invalid role'),
 ];
 
+// Validation for change password
+const validateChangePassword = [
+  body('oldPassword').notEmpty().withMessage('Old password is required'),
+
+  body('newPassword')
+    .notEmpty()
+    .withMessage('New password is required')
+    .isLength({ min: 6 })
+    .withMessage('New password must be at least 6 characters'),
+
+  body('confirmPassword')
+    .notEmpty()
+    .withMessage('Confirm password is required')
+    .custom((value, { req }) => {
+      if (value !== req.body.newPassword) {
+        throw new Error('Passwords do not match');
+      }
+      return true;
+    }),
+];
+
 module.exports = {
   validateLogin,
   validateSignup,
+  validateChangePassword,
 };

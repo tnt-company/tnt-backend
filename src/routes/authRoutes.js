@@ -1,8 +1,12 @@
 const express = require('express');
 const authController = require('../controllers/authController');
-const { protect } = require('../middleware/auth');
+const { protect, adminOnly } = require('../middleware/auth');
 const validate = require('../middleware/validate');
-const { validateLogin, validateSignup } = require('../validators/authValidators');
+const {
+  validateLogin,
+  validateSignup,
+  validateChangePassword,
+} = require('../validators/authValidators');
 
 const router = express.Router();
 
@@ -12,5 +16,14 @@ router.post('/login', validate(validateLogin), authController.login);
 
 // Protected routes
 router.get('/me', protect, authController.getMe);
+
+// Admin-only routes
+router.post(
+  '/change-password',
+  protect,
+  adminOnly,
+  validate(validateChangePassword),
+  authController.changePassword
+);
 
 module.exports = router;
