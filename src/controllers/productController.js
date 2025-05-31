@@ -155,7 +155,7 @@ class ProductController {
 
           await Promise.all(deletePromises);
         }
-        
+
         // Set empty array in update data
         updateData.imageUrls = [];
       }

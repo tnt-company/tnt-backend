@@ -31,7 +31,7 @@ const Product = sequelize.define(
     },
     categoryId: {
       type: DataTypes.UUID,
-      allowNull: true,
+      allowNull: false,
       field: 'category_id',
       references: {
         model: 'Categories',
@@ -71,6 +71,32 @@ const Product = sequelize.define(
     timestamps: true,
     underscored: true,
     tableName: 'Products',
+    hooks: {
+      beforeCreate: product => {
+        // Trim all string fields
+        if (product.name) product.name = product.name.trim();
+        if (product.description) product.description = product.description.trim();
+
+        // Also trim strings in array fields if they exist
+        if (product.imageUrls && Array.isArray(product.imageUrls)) {
+          product.imageUrls = product.imageUrls.map(url =>
+            typeof url === 'string' ? url.trim() : url
+          );
+        }
+      },
+      beforeUpdate: product => {
+        // Trim all string fields
+        if (product.changed('name')) product.name = product.name.trim();
+        if (product.changed('description')) product.description = product.description.trim();
+
+        // Also trim strings in array fields if they exist
+        if (product.changed('imageUrls') && Array.isArray(product.imageUrls)) {
+          product.imageUrls = product.imageUrls.map(url =>
+            typeof url === 'string' ? url.trim() : url
+          );
+        }
+      },
+    },
   }
 );
 

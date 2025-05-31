@@ -28,6 +28,18 @@ const Category = sequelize.define(
     timestamps: true,
     underscored: true,
     tableName: 'Categories',
+    hooks: {
+      beforeCreate: category => {
+        // Trim all string fields
+        if (category.name) category.name = category.name.trim();
+        if (category.description) category.description = category.description.trim();
+      },
+      beforeUpdate: category => {
+        // Trim all string fields
+        if (category.changed('name')) category.name = category.name.trim();
+        if (category.changed('description')) category.description = category.description.trim();
+      },
+    },
   }
 );
 

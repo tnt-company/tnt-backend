@@ -17,7 +17,8 @@ const checkAndRotateLogFile = () => {
   try {
     if (fs.existsSync(accessLogPath)) {
       const stats = fs.statSync(accessLogPath);
-      if (stats.size >= 1048576) { // 1 MB = 1048576 bytes
+      if (stats.size >= 1048576) {
+        // 1 MB = 1048576 bytes
         fs.writeFileSync(accessLogPath, ''); // Empty the file
         console.log(`[INFO] Log file size exceeded 1MB. Log file has been emptied.`);
       }
@@ -92,5 +93,5 @@ module.exports = {
   logger,
   checkAndRotateLogFile,
   logSizeCheckMiddleware,
-  forceRotateLogFile
+  forceRotateLogFile,
 };

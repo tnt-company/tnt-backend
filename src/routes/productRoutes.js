@@ -31,16 +31,18 @@ const upload = multer({
 
 // Custom error handler for multer errors like file size
 const handleMulterErrors = (req, res, next) => {
-  upload.array('images', 10)(req, res, (err) => {
+  upload.array('images', 10)(req, res, err => {
     if (err instanceof multer.MulterError) {
       if (err.code === 'LIMIT_FILE_SIZE') {
         // For file size errors, we want to provide more details
-        return res.status(400).json({ 
-          success: false, 
-          message: `Image upload error: File size exceeds the 5MB limit` 
+        return res.status(400).json({
+          success: false,
+          message: `Image upload error: File size exceeds the 5MB limit`,
         });
       }
-      return res.status(400).json({ success: false, message: `Image upload error: ${err.message}` });
+      return res
+        .status(400)
+        .json({ success: false, message: `Image upload error: ${err.message}` });
     } else if (err) {
       return res.status(400).json({ success: false, message: err.message });
     }
