@@ -97,10 +97,26 @@ const validateUpdateProduct = [
 // Validation for deleting a product
 const validateDeleteProduct = validateProductId;
 
+// Validation for bulk creating products
+const validateBulkCreateProducts = [
+  body('count')
+    .notEmpty()
+    .withMessage('Count is required')
+    .isInt({ min: 1, max: 1000 })
+    .withMessage('Count must be a number between 1 and 1000'),
+
+  body('categoryId')
+    .notEmpty()
+    .withMessage('Category ID is required')
+    .isUUID(4)
+    .withMessage('Category ID must be a valid UUID'),
+];
+
 module.exports = {
   validateGetProducts,
   validateProductId,
   validateCreateProduct,
   validateUpdateProduct,
   validateDeleteProduct,
+  validateBulkCreateProducts,
 };
