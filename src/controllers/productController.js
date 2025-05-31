@@ -216,6 +216,36 @@ class ProductController {
       next(error);
     }
   }
+
+  /**
+   * Bulk create products with dummy data
+   * @route POST /api/products/bulk
+   * @access Private/Admin
+   */
+  async bulkCreateProducts(req, res, next) {
+    try {
+      const { count, categoryId } = req.body;
+
+      // Check if category exists
+      const category = await require('../services/categoryService').getCategoryById(categoryId);
+      if (!category) {
+        const error = new Error('Category not found');
+        error.statusCode = HTTP_STATUS.NOT_FOUND;
+        throw error;
+      }
+
+      // Create products
+      const result = await productService.bulkCreateProducts(count, categoryId);
+
+      res.status(HTTP_STATUS.CREATED).json({
+        success: true,
+        message: result.message,
+        count: result.count,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new ProductController();

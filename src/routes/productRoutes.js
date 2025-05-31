@@ -9,6 +9,7 @@ const {
   validateCreateProduct,
   validateUpdateProduct,
   validateDeleteProduct,
+  validateBulkCreateProducts,
 } = require('../validators/productValidators');
 
 const router = express.Router();
@@ -64,6 +65,11 @@ router.route('/').post(
   validate(validateCreateProduct),
   productController.createProduct
 );
+
+// Bulk create products route (admin only)
+router
+  .route('/bulk')
+  .post(adminOnly, validate(validateBulkCreateProducts), productController.bulkCreateProducts);
 
 router
   .route('/:id')
