@@ -144,6 +144,20 @@ class ProductController {
 
         // Set the imageUrls in update data
         updateData.imageUrls = imageUrls;
+      } else {
+        // If no files provided, delete all existing images
+        if (currentProduct.imageUrls && currentProduct.imageUrls.length > 0) {
+          const deletePromises = currentProduct.imageUrls.map(imageUrl =>
+            storageProvider.deleteFile(imageUrl).catch(err => {
+              console.error(`Error deleting image ${imageUrl}:`, err.message);
+            })
+          );
+
+          await Promise.all(deletePromises);
+        }
+
+        // Set empty array in update data
+        updateData.imageUrls = [];
       }
 
       const product = await productService.updateProduct(req.params.id, updateData);
@@ -197,6 +211,36 @@ class ProductController {
       res.status(HTTP_STATUS.OK).json({
         success: true,
         message: 'Product deleted successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Bulk create products with dummy data
+   * @route POST /api/products/bulk
+   * @access Private/Admin
+   */
+  async bulkCreateProducts(req, res, next) {
+    try {
+      const { count, categoryId } = req.body;
+
+      // Check if category exists
+      const category = await require('../services/categoryService').getCategoryById(categoryId);
+      if (!category) {
+        const error = new Error('Category not found');
+        error.statusCode = HTTP_STATUS.NOT_FOUND;
+        throw error;
+      }
+
+      // Create products
+      const result = await productService.bulkCreateProducts(count, categoryId);
+
+      res.status(HTTP_STATUS.CREATED).json({
+        success: true,
+        message: result.message,
+        count: result.count,
       });
     } catch (error) {
       next(error);

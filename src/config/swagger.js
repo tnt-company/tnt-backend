@@ -25,6 +25,10 @@ const swaggerDefinition = {
       url: 'http://localhost:3000',
       description: 'Development server',
     },
+    {
+      url: 'http://13.232.94.63:3001',
+      description: 'Staging server',
+    },
   ],
   components: {
     securitySchemes: {
@@ -321,8 +325,7 @@ const swaggerDefinition = {
             type: 'string',
             format: 'uuid',
             example: '550e8400-e29b-41d4-a716-446655440000',
-            nullable: true,
-            description: 'Category ID (optional, can be null)',
+            description: 'Category ID (required)',
           },
           salesPrice: {
             type: 'number',

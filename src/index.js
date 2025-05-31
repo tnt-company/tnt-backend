@@ -2,7 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const swaggerUi = require('swagger-ui-express');
-const { httpLogger, logger } = require('./utils/logger');
+const {
+  httpLogger,
+  logger,
+  logSizeCheckMiddleware,
+  checkAndRotateLogFile,
+} = require('./utils/logger');
 const config = require('./config/config');
 const { connectDB, sequelize } = require('./config/database');
 const routes = require('./routes');
@@ -16,6 +21,7 @@ const app = express();
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors()); // Enable CORS
+app.use(logSizeCheckMiddleware); // Check log file size periodically
 app.use(httpLogger); // HTTP request logging
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
@@ -64,6 +70,12 @@ const startServer = async () => {
         throw syncError;
       }
     }
+
+    // Schedule log file rotation check every hour
+    setInterval(() => {
+      logger.debug('Running scheduled log file size check');
+      checkAndRotateLogFile();
+    }, 3600000); // Check every hour (3600000 ms)
 
     // Start server
     const server = app.listen(PORT, () => {

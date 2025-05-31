@@ -77,12 +77,20 @@ const User = sequelize.define(
     },
     hooks: {
       beforeCreate: async user => {
+        // Trim all string fields
+        if (user.name) user.name = user.name.trim();
+        if (user.email) user.email = user.email.trim();
+
         if (user.password) {
           const salt = await bcrypt.genSalt(10);
           user.password = await bcrypt.hash(user.password, salt);
         }
       },
       beforeUpdate: async user => {
+        // Trim all string fields
+        if (user.changed('name')) user.name = user.name.trim();
+        if (user.changed('email')) user.email = user.email.trim();
+
         if (user.changed('password')) {
           const salt = await bcrypt.genSalt(10);
           user.password = await bcrypt.hash(user.password, salt);

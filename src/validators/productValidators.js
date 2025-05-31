@@ -41,25 +41,10 @@ const productDataValidation = [
   body('imageUrls').optional().isArray().withMessage('Image URLs must be an array'),
 
   body('categoryId')
-    .optional({ nullable: true })
-    .customSanitizer(value => {
-      // Convert empty strings or undefined to null
-      if (value === undefined || value === '' || value === null) {
-        return null;
-      }
-      return value;
-    })
-    .custom(value => {
-      // If value is null, accept it
-      if (value === null) {
-        return true;
-      }
-      // Otherwise, check if it's a valid UUID
-      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)) {
-        throw new Error('Category ID must be a valid UUID');
-      }
-      return true;
-    }),
+    .notEmpty()
+    .withMessage('Category ID is required')
+    .isUUID(4)
+    .withMessage('Category ID must be a valid UUID'),
 
   body('salesPrice')
     .notEmpty()
@@ -92,25 +77,11 @@ const validateUpdateProduct = [
   body('imageUrls').optional().isArray().withMessage('Image URLs must be an array'),
 
   body('categoryId')
-    .optional({ nullable: true })
-    .customSanitizer(value => {
-      // Convert empty strings or undefined to null
-      if (value === undefined || value === '' || value === null) {
-        return null;
-      }
-      return value;
-    })
-    .custom(value => {
-      // If value is null, accept it
-      if (value === null) {
-        return true;
-      }
-      // Otherwise, check if it's a valid UUID
-      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)) {
-        throw new Error('Category ID must be a valid UUID');
-      }
-      return true;
-    }),
+    .optional()
+    .notEmpty()
+    .withMessage('Category ID cannot be empty if provided')
+    .isUUID(4)
+    .withMessage('Category ID must be a valid UUID'),
 
   body('salesPrice')
     .optional()
@@ -126,10 +97,26 @@ const validateUpdateProduct = [
 // Validation for deleting a product
 const validateDeleteProduct = validateProductId;
 
+// Validation for bulk creating products
+const validateBulkCreateProducts = [
+  body('count')
+    .notEmpty()
+    .withMessage('Count is required')
+    .isInt({ min: 1, max: 1000 })
+    .withMessage('Count must be a number between 1 and 1000'),
+
+  body('categoryId')
+    .notEmpty()
+    .withMessage('Category ID is required')
+    .isUUID(4)
+    .withMessage('Category ID must be a valid UUID'),
+];
+
 module.exports = {
   validateGetProducts,
   validateProductId,
   validateCreateProduct,
   validateUpdateProduct,
   validateDeleteProduct,
+  validateBulkCreateProducts,
 };

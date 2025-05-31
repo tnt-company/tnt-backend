@@ -100,8 +100,7 @@ module.exports = {
                   type: 'string',
                   format: 'uuid',
                   example: '550e8400-e29b-41d4-a716-446655440000',
-                  nullable: true,
-                  description: 'Category ID (optional, can be null)',
+                  description: 'Category ID (required)',
                 },
                 salesPrice: {
                   type: 'number',
@@ -114,7 +113,7 @@ module.exports = {
                   example: 599.99,
                 },
               },
-              required: ['name', 'salesPrice', 'costPrice'],
+              required: ['name', 'salesPrice', 'costPrice', 'categoryId'],
             },
           },
         },
@@ -147,6 +146,91 @@ module.exports = {
         },
         403: {
           $ref: '#/components/responses/ForbiddenError',
+        },
+      },
+    },
+  },
+  '/api/products/bulk': {
+    post: {
+      tags: ['Products'],
+      summary: 'Bulk create products',
+      description: 'Create multiple dummy products at once (Admin only)',
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                count: {
+                  type: 'integer',
+                  example: 10,
+                  minimum: 1,
+                  maximum: 1000,
+                  description: 'Number of products to create (between 1 and 1000)',
+                },
+                categoryId: {
+                  type: 'string',
+                  format: 'uuid',
+                  example: '550e8400-e29b-41d4-a716-446655440000',
+                  description: 'Category ID to assign to all created products',
+                },
+              },
+              required: ['count', 'categoryId'],
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: 'Products created successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
+                  message: {
+                    type: 'string',
+                    example: 'Successfully created 10 products',
+                  },
+                  count: {
+                    type: 'integer',
+                    example: 10,
+                  },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          $ref: '#/components/responses/ValidationError',
+        },
+        401: {
+          $ref: '#/components/responses/UnauthorizedError',
+        },
+        403: {
+          $ref: '#/components/responses/ForbiddenError',
+        },
+        404: {
+          description: 'Category not found',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Error',
+              },
+              example: {
+                success: false,
+                error: {
+                  message: 'Category not found',
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -242,8 +326,7 @@ module.exports = {
                   type: 'string',
                   format: 'uuid',
                   example: '550e8400-e29b-41d4-a716-446655440000',
-                  nullable: true,
-                  description: 'Category ID (optional, can be null)',
+                  description: 'Category ID (required)',
                 },
                 salesPrice: {
                   type: 'number',
