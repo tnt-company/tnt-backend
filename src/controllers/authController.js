@@ -129,6 +129,39 @@ class AuthController {
       data: req.user,
     });
   }
+
+  /**
+   * Change user password
+   * @route POST /api/auth/change-password
+   * @access Private/Admin
+   */
+  async changePassword(req, res, next) {
+    try {
+      const { oldPassword, newPassword } = req.body;
+
+      // Get user with password
+      const user = await User.scope('withPassword').findByPk(req.user.id);
+
+      // Verify old password
+      const isMatch = await user.matchPassword(oldPassword);
+      if (!isMatch) {
+        const error = new Error('Current password is incorrect');
+        error.statusCode = HTTP_STATUS.BAD_REQUEST;
+        throw error;
+      }
+
+      // Update password
+      user.password = newPassword;
+      await user.save();
+
+      res.status(HTTP_STATUS.OK).json({
+        success: true,
+        message: 'Password changed successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new AuthController();

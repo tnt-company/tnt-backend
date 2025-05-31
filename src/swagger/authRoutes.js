@@ -228,6 +228,114 @@ const authRoutes = {
       },
     },
   },
+  '/api/auth/change-password': {
+    post: {
+      summary: 'Change user password',
+      description: 'Change the password of the authenticated user (Admin only)',
+      tags: ['Authentication'],
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['oldPassword', 'newPassword', 'confirmPassword'],
+              properties: {
+                oldPassword: {
+                  type: 'string',
+                  description: 'Current password',
+                  example: 'currentpassword123',
+                },
+                newPassword: {
+                  type: 'string',
+                  description: 'New password (min 6 characters)',
+                  example: 'newpassword123',
+                },
+                confirmPassword: {
+                  type: 'string',
+                  description: 'Confirm new password (must match newPassword)',
+                  example: 'newpassword123',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Password changed successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
+                  message: {
+                    type: 'string',
+                    example: 'Password changed successfully',
+                  },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error or incorrect old password',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationError',
+              },
+              examples: {
+                incorrectPassword: {
+                  value: {
+                    success: false,
+                    error: {
+                      message: 'Current password is incorrect',
+                    },
+                  },
+                },
+                passwordMismatch: {
+                  value: {
+                    success: false,
+                    error: {
+                      message: 'Validation failed',
+                      details: [
+                        {
+                          field: 'confirmPassword',
+                          message: 'Passwords do not match',
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        401: {
+          $ref: '#/components/responses/UnauthorizedError',
+        },
+        403: {
+          $ref: '#/components/responses/ForbiddenError',
+        },
+        500: {
+          description: 'Server error',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Error',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 };
 
 module.exports = authRoutes;
