@@ -2,7 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const swaggerUi = require('swagger-ui-express');
-const { httpLogger, logger, logSizeCheckMiddleware, checkAndRotateLogFile } = require('./utils/logger');
+const {
+  httpLogger,
+  logger,
+  logSizeCheckMiddleware,
+  checkAndRotateLogFile,
+} = require('./utils/logger');
 const config = require('./config/config');
 const { connectDB, sequelize } = require('./config/database');
 const routes = require('./routes');

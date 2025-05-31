@@ -100,8 +100,7 @@ module.exports = {
                   type: 'string',
                   format: 'uuid',
                   example: '550e8400-e29b-41d4-a716-446655440000',
-                  nullable: true,
-                  description: 'Category ID (optional, can be null)',
+                  description: 'Category ID (required)',
                 },
                 salesPrice: {
                   type: 'number',
@@ -114,7 +113,7 @@ module.exports = {
                   example: 599.99,
                 },
               },
-              required: ['name', 'salesPrice', 'costPrice'],
+              required: ['name', 'salesPrice', 'costPrice', 'categoryId'],
             },
           },
         },
@@ -242,8 +241,7 @@ module.exports = {
                   type: 'string',
                   format: 'uuid',
                   example: '550e8400-e29b-41d4-a716-446655440000',
-                  nullable: true,
-                  description: 'Category ID (optional, can be null)',
+                  description: 'Category ID (required)',
                 },
                 salesPrice: {
                   type: 'number',
