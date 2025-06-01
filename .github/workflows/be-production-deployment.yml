@@ -3,12 +3,12 @@ name: Deploy Backend to EC2
 on:
   push:
     branches:
-      - development
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: Development  
+    environment: Production
 
     steps:
     - name: Checkout code
@@ -23,12 +23,12 @@ jobs:
 
     - name: Download SSH key from S3
       run: |
-        aws s3 cp s3://tnt-development-new/environment-variables/config/tnt-development.pem  ec2_key.pem
+        aws s3 cp s3://tntnotebook-production/environment-variables/config/tntnotebook-production.pem  ec2_key.pem
         chmod 600 ec2_key.pem
 
     - name: Download environment file from S3
       run: |
-        aws s3 cp s3://tnt-development-new/environment-variables/config/.env .env
+        aws s3 cp s3://tntnotebook-production/environment-variables/config/.env .env  
 
     - name: Get EC2 Public IP
       id: ec2ip
@@ -46,10 +46,10 @@ jobs:
           # Add Node and npm to PATH
           export PATH="$HOME/.nvm/versions/node/v18.17.1/bin:$PATH"
 
-          cd /var/www/html/tnt-development/tnt-backend
+          cd /var/www/html/tntnotebook-production/tnt-backend
           
           echo "Pulling latest code..."
-          git pull origin development
+          git pull origin main
           
           echo "Installing dependencies..."
           npm install
@@ -58,12 +58,12 @@ jobs:
           npx sequelize-cli db:migrate  
 
           echo "Stopping current app..."
-          pm2 stop test.json || echo "PM2 process not found, continuing..."
+          pm2 stop production.json || echo "PM2 process not found, continuing..."
 
           echo "Deleting old process..."
-          pm2 delete test.json || echo "PM2 process not found for delete, continuing..."
+          pm2 delete production.json || echo "PM2 process not found for delete, continuing..."
 
           echo "Restarting app..."
-          pm2 start test.json 
+          pm2 start production.json 
         EOF
 
