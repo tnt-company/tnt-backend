@@ -44,6 +44,7 @@ class CategoryService {
         where: whereClause,
         order: [['name', 'ASC']],
       }),
+      totalCategories,
     };
   }
 
