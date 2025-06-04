@@ -13,7 +13,7 @@ class CategoryService {
    * @param {string} search - Search term for filtering by name
    * @returns {Promise<Object>} Categories and total count
    */
-  async getAllCategories(page, search = '') {
+  async getAllCategories(page, search = '', pagination = 'true') {
     const pageOffset = page ? (page - 1) * PAGINATION.DEFAULT_LIMIT : 0;
 
     // Build where clause based on search term
@@ -27,14 +27,23 @@ class CategoryService {
 
     const totalCategories = await Category.count({ where: whereClause });
 
+    if (pagination && pagination === 'true') {
+      return {
+        categories: await Category.findAll({
+          where: whereClause,
+          limit: PAGINATION.DEFAULT_LIMIT,
+          offset: pageOffset,
+          order: [['name', 'ASC']],
+        }),
+        totalCategories,
+      };
+    }
+
     return {
       categories: await Category.findAll({
         where: whereClause,
-        limit: PAGINATION.DEFAULT_LIMIT,
-        offset: pageOffset,
         order: [['name', 'ASC']],
       }),
-      totalCategories,
     };
   }
 

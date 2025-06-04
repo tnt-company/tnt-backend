@@ -15,7 +15,8 @@ class CategoryController {
     try {
       const { categories, totalCategories } = await categoryService.getAllCategories(
         req.query.page,
-        req.query.search
+        req.query.search,
+        req.query.pagination,
       );
       res.status(HTTP_STATUS.OK).json({
         success: true,
